@@ -70,6 +70,8 @@ def text_handler(text, chat_id):
             message = "Current month income list:\n\n"
             for r in rows:
                 message = message + str(r).replace("(", "").replace(")", "").replace("'", "") + "\n"
+            total_income = db.get_total_income(month)
+            message = message+"\n\nTotal income: "+str(total_income)+" €"
         else:
             message = "No income to be displayed here " + emoji["openhands"]
     elif text == "/listoutcome":
@@ -80,8 +82,21 @@ def text_handler(text, chat_id):
             message = "Current month outcome list:\n\n"
             for r in rows:
                 message = message+str(r).replace("(", "").replace(")", "").replace("'", "")+"\n"
+            total_outcome = db.get_total_income(month)
+            message = message+"\n\nTotal income: "+str(total_outcome)+" €"
         else:
             message = "No income to be displayed here " + emoji["openhands"]
+    elif text == "/balance":
+        month = datetime.now().strftime("%m")
+        total_income = db.get_total_income(month)
+        if total_income is None:
+            total_income = 0.0
+        total_outcome = db.get_total_outcome(month)
+        if total_outcome is None:
+            total_outcome = 0.0
+        logging.info(total_outcome)
+        balance = total_income + total_outcome
+        message = "Current month balance: "+str(balance)+" €\n\n\nTotal income: "+str(total_income)+" €\n\nTotal outcome: "+str(total_outcome)+" €"
     handler.send_message(message, chat_id)
 
 
