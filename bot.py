@@ -7,11 +7,6 @@ from messageHandler import MessageHandler
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 db = DBHelper()
-f = open("master.txt", "r")
-master = int(f.readline())
-if not master:
-    logging.error("Error occurred, have you filled the master.txt file with your master id?")
-    exit()
 
 
 handler = MessageHandler()
@@ -29,7 +24,8 @@ reply = {
 # i found those code here https://apps.timwhitlock.info/emoji/tables/unicode :)
 emoji = {
     "moneybag": u'\U0001F4B0',
-    "moneywings": u'\U0001F4B8'
+    "moneywings": u'\U0001F4B8',
+    "openhands": u'\U0001F450'
 }
 
 
@@ -70,16 +66,37 @@ def text_handler(text, chat_id):
         month = datetime.now().strftime("%m")
         rows = db.get_income(month)
         logging.info(rows)
-        message = "Current month income list:\n\n"
-        for r in rows:
-            message = message + str(r).replace("(", "").replace(")", "").replace("'", "") + "\n"
+        if rows:
+            message = "Current month income list:\n\n"
+            for r in rows:
+                message = message + str(r).replace("(", "").replace(")", "").replace("'", "") + "\n"
+            total_income = db.get_total_income(month)
+            message = message+"\n\nTotal income: "+str(total_income)+" €"
+        else:
+            message = "No income to be displayed here " + emoji["openhands"]
     elif text == "/listoutcome":
         month = datetime.now().strftime("%m")
         rows = db.get_outcome(month)
         logging.info(rows)
-        message = "Current month outcome list:\n\n"
-        for r in rows:
-            message = message+str(r).replace("(", "").replace(")", "").replace("'", "")+"\n"
+        if rows:
+            message = "Current month outcome list:\n\n"
+            for r in rows:
+                message = message+str(r).replace("(", "").replace(")", "").replace("'", "")+"\n"
+            total_outcome = db.get_total_income(month)
+            message = message+"\n\nTotal income: "+str(total_outcome)+" €"
+        else:
+            message = "No income to be displayed here " + emoji["openhands"]
+    elif text == "/balance":
+        month = datetime.now().strftime("%m")
+        total_income = db.get_total_income(month)
+        if total_income is None:
+            total_income = 0.0
+        total_outcome = db.get_total_outcome(month)
+        if total_outcome is None:
+            total_outcome = 0.0
+        logging.info(total_outcome)
+        balance = total_income + total_outcome
+        message = "Current month balance: "+str(balance)+" €\n\n\nTotal income: "+str(total_income)+" €\n\nTotal outcome: "+str(total_outcome)+" €"
     handler.send_message(message, chat_id)
 
 

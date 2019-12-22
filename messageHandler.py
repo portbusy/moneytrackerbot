@@ -12,19 +12,30 @@ TOKEN = f.readline()
 if not TOKEN:
     logging.error("Error occurred, have you filled the token.txt file with your bot token?")
     exit()
+
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
+
+f = open("master.txt", "r")
+master = int(f.readline())
+if not master:
+    logging.error("Error occurred, have you filled the master.txt file with your master id?")
+    exit()
 
 
 class MessageHandler:
 
     def __init__(self):
-        self.master = 58677785
+        self.master = master
         self.allowed = [self.master]
 
     #
     def get_url(self, url):
-        response = requests.get(url)
-        content = response.content.decode("utf8")
+        try:
+            response = requests.get(url)
+            content = response.content.decode("utf8")
+        except requests.exceptions.ConnectionError:
+            logging.info("Max retries exceed")
+            content = ""
         return content
 
     #

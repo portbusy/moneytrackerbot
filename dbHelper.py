@@ -44,9 +44,24 @@ class DBHelper:
         rows = cur.fetchall()
         return rows
 
+    def get_total_income(self, month):
+        cur = self.conn.cursor()
+        stmt = "SELECT SUM(value) FROM income WHERE strftime('%m', date) = '" + month + "'"
+        cur.execute(stmt)
+        total = cur.fetchone()
+        return total[0]
+
     def get_outcome(self, month):
         cur = self.conn.cursor()
         stmt = "SELECT * FROM outcome WHERE strftime('%m', date) = '"+month+"'"
         cur.execute(stmt)
         rows = cur.fetchall()
         return rows
+
+    def get_total_outcome(self, month):
+        cur = self.conn.cursor()
+        stmt = "SELECT SUM(value) FROM outcome WHERE strftime('%m', date) = '" + month + "'"
+        cur.execute(stmt)
+        total = cur.fetchone()
+        return total[0]
+
