@@ -12,6 +12,7 @@ TOKEN = f.readline()
 if not TOKEN:
     logging.error("Error occurred, have you filled the token.txt file with your bot token?")
     exit()
+
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 
 
@@ -23,8 +24,12 @@ class MessageHandler:
 
     #
     def get_url(self, url):
-        response = requests.get(url)
-        content = response.content.decode("utf8")
+        try:
+            response = requests.get(url)
+            content = response.content.decode("utf8")
+        except requests.exceptions.ConnectionError:
+            logging.info("Max retries exceed")
+            content = ""
         return content
 
     #
