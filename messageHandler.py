@@ -15,11 +15,17 @@ if not TOKEN:
 
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 
+f = open("master.txt", "r")
+master = int(f.readline())
+if not master:
+    logging.error("Error occurred, have you filled the master.txt file with your master id?")
+    exit()
+
 
 class MessageHandler:
 
     def __init__(self):
-        self.master = 58677785
+        self.master = master
         self.allowed = [self.master]
 
     #

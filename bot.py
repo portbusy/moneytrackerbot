@@ -7,11 +7,6 @@ from messageHandler import MessageHandler
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 db = DBHelper()
-f = open("master.txt", "r")
-master = int(f.readline())
-if not master:
-    logging.error("Error occurred, have you filled the master.txt file with your master id?")
-    exit()
 
 
 handler = MessageHandler()
@@ -29,7 +24,8 @@ reply = {
 # i found those code here https://apps.timwhitlock.info/emoji/tables/unicode :)
 emoji = {
     "moneybag": u'\U0001F4B0',
-    "moneywings": u'\U0001F4B8'
+    "moneywings": u'\U0001F4B8',
+    "openhands": u'\U0001F450'
 }
 
 
@@ -70,16 +66,22 @@ def text_handler(text, chat_id):
         month = datetime.now().strftime("%m")
         rows = db.get_income(month)
         logging.info(rows)
-        message = "Current month income list:\n\n"
-        for r in rows:
-            message = message + str(r).replace("(", "").replace(")", "").replace("'", "") + "\n"
+        if rows:
+            message = "Current month income list:\n\n"
+            for r in rows:
+                message = message + str(r).replace("(", "").replace(")", "").replace("'", "") + "\n"
+        else:
+            message = "No income to be displayed here " + emoji["openhands"]
     elif text == "/listoutcome":
         month = datetime.now().strftime("%m")
         rows = db.get_outcome(month)
         logging.info(rows)
-        message = "Current month outcome list:\n\n"
-        for r in rows:
-            message = message+str(r).replace("(", "").replace(")", "").replace("'", "")+"\n"
+        if rows:
+            message = "Current month outcome list:\n\n"
+            for r in rows:
+                message = message+str(r).replace("(", "").replace(")", "").replace("'", "")+"\n"
+        else:
+            message = "No income to be displayed here " + emoji["openhands"]
     handler.send_message(message, chat_id)
 
 
