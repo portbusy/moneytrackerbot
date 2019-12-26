@@ -82,7 +82,7 @@ def text_handler(text, chat_id):
             message = "Current month outcome list:\n\n"
             for r in rows:
                 message = message+str(r).replace("(", "").replace(")", "").replace("'", "")+"\n"
-            total_outcome = db.get_total_income(month)
+            total_outcome = db.get_total_outcome(month)
             message = message+"\n\nTotal income: "+str(total_outcome)+" €"
         else:
             message = "No income to be displayed here " + emoji["openhands"]
@@ -95,9 +95,27 @@ def text_handler(text, chat_id):
         if total_outcome is None:
             total_outcome = 0.0
         logging.info(total_outcome)
-        balance = total_income + total_outcome
+        balance = total_income - total_outcome
         message = "Current month balance: "+str(balance)+" €\n\n\nTotal income: "+str(total_income)+" €\n\nTotal outcome: "+str(total_outcome)+" €"
+    elif text.startswith("/adduser"):
+        if len(text) < 9:
+            message = "Missing chat id you want to add"
+        else:
+            if add_user(text[9:len(text)]):
+                message = "New user added successfully!"
+            else:
+                message = "An error occurred while adding new user"
     handler.send_message(message, chat_id)
+
+
+def add_user(user_id):
+    try:
+        f = open("users.txt", "a")
+        f.write("\n"+str(user_id))
+        f.close()
+        return 1
+    except:
+        return 0
 
 
 def main():

@@ -1,5 +1,5 @@
 # Description
-This is the first version of my telegram bot which allows a simple expenses tracker.
+This is the first version of my personal telegram bot which allows a simple expenses tracking.
 
 The bot can now take income and outcome and display the current month resume; here is a list of commands:
 * `/listoutcome` print the list of current month outcome

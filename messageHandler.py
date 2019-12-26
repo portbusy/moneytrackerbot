@@ -43,7 +43,7 @@ class MessageHandler:
         try:
             content = self.get_url(url)
             js = json.loads(content)
-        except AttributeError:
+        except AttributeError or json.decoder.JSONDecodeError:
             event_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             logging.error("\nFailed to load json content at {}, content was {}\n".format(event_time, self.get_url(url)))
             js = []
