@@ -5,12 +5,14 @@ from datetime import datetime
 from urllib import parse
 from sys import exit
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funcName) -35s %(lineno) -5d: %(message)s')
+LOGGER = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 f = open("token.txt", "r")
 TOKEN = f.readline()
 if not TOKEN:
-    logging.error("Error occurred, have you filled the token.txt file with your bot token?")
+    LOGGER.error("Error occurred, have you filled the token.txt file with your bot token?")
     exit()
 
 URL = "https://api.telegram.org/bot{}/".format(TOKEN)
@@ -18,7 +20,7 @@ URL = "https://api.telegram.org/bot{}/".format(TOKEN)
 f = open("master.txt", "r")
 master = int(f.readline())
 if not master:
-    logging.error("Error occurred, have you filled the master.txt file with your master id?")
+    LOGGER.error("Error occurred, have you filled the master.txt file with your master id?")
     exit()
 
 
@@ -33,25 +35,32 @@ class MessageHandler:
         try:
             response = requests.get(url)
             content = response.content.decode("utf8")
+            LOGGER.info("Response message: {}".format(content))
         except requests.exceptions.ConnectionError:
-            logging.info("Max retries exceed")
-            content = ""
+            content = str({
+                "ok": True,
+                "result": []
+            })
+            LOGGER.info("Max retries exceed, passing composed content: {}".format(content))
         return content
 
     #
     def get_json_from_url(self, url):
+        content = self.get_url(url)
         try:
-            content = self.get_url(url)
             js = json.loads(content)
+            LOGGER.info("Got json from url: {}".format(js))
         except AttributeError:
-            event_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            logging.error("\nFailed to load json content at {}, content was {}\n".format(event_time, self.get_url(url)))
-            js = []
+            LOGGER.error("Attribute error, content was {}".format(content))
+            js = json.loads(self.get_url(url))
+        except json.decoder.JSONDecodeError:
+            LOGGER.error("Json decode error, content was {}\n".format(content))
+            js = json.loads(self.get_url(url))
         return js
 
     #
     def get_updates(self, offset=None):
-        url = URL + "getUpdates?timeout=1"
+        url = URL + "getUpdates?timeout=240"
         if offset:
             url += "&offset={}".format(offset)
         js = self.get_json_from_url(url)
@@ -79,8 +88,8 @@ class MessageHandler:
         try:
             text = updates["result"][last_update]["message"]["text"]
         except:
-            text = "no valid text"
-            logging.error("no valid text")
+            LOGGER.error("No valid text provided!")
+            text = "No valid text provided"
         chat_id = updates["result"][last_update]["message"]["chat"]["id"]
         return text, chat_id
 
@@ -104,7 +113,7 @@ class MessageHandler:
     def id_check(self, updates):
         for update in updates["result"]:
             chat = update["message"]["chat"]["id"]
-            logging.info("chat: {}, allowed: {}".format(chat, self.allowed))
+            LOGGER.debug("chat: {}, allowed: {}".format(chat, self.allowed))
             date = update["message"]["date"]
             time = datetime.fromtimestamp(date)
             time = time.strftime('%Y-%m-%d at %H:%M:%S')
@@ -122,7 +131,7 @@ class MessageHandler:
                 username = "n/a"
 
         if chat in self.allowed:
-            #logging.info("\nconnection from: {} ... \nconnection successful".format(chat))
+            LOGGER.info("Connection from: {}".format(chat))
             return 1
         else:
             self.send_message("Unknown user, access denied. Contact system admin", chat)

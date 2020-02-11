@@ -3,8 +3,8 @@ FROM python:3.7
 WORKDIR "/home/davide/.shared/moneytrakerBot"
 
 
-COPY requirements.txt ./
+ADD requirements.txt ./
 RUN pip install -r requirements.txt
 
-COPY . .
+ADD * ./
 CMD ["python", "./bot.py"]

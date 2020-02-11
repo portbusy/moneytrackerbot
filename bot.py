@@ -4,7 +4,9 @@ from dbHelper import DBHelper
 from messageHandler import MessageHandler
 
 
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+LOG_FORMAT = ('%(levelname) -10s %(asctime)s %(name) -30s %(funName) -35s %(lineno) -5d: %(message)s')
+LOGGER = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
 db = DBHelper()
 
@@ -65,7 +67,7 @@ def text_handler(text, chat_id):
     elif text == "/listincome":
         month = datetime.now().strftime("%m")
         rows = db.get_income(month)
-        logging.info(rows)
+        LOGGER.info(rows)
         if rows:
             message = "Current month income list:\n\n"
             for r in rows:
@@ -77,12 +79,12 @@ def text_handler(text, chat_id):
     elif text == "/listoutcome":
         month = datetime.now().strftime("%m")
         rows = db.get_outcome(month)
-        logging.info(rows)
+        LOGGER.info(rows)
         if rows:
             message = "Current month outcome list:\n\n"
             for r in rows:
                 message = message+str(r).replace("(", "").replace(")", "").replace("'", "")+"\n"
-            total_outcome = db.get_total_income(month)
+            total_outcome = db.get_total_outcome(month)
             message = message+"\n\nTotal income: "+str(total_outcome)+" €"
         else:
             message = "No income to be displayed here " + emoji["openhands"]
@@ -94,7 +96,7 @@ def text_handler(text, chat_id):
         total_outcome = db.get_total_outcome(month)
         if total_outcome is None:
             total_outcome = 0.0
-        logging.info(total_outcome)
+        LOGGER.info(total_outcome)
         balance = total_income + total_outcome
         message = "Current month balance: "+str(balance)+" €\n\n\nTotal income: "+str(total_income)+" €\n\nTotal outcome: "+str(total_outcome)+" €"
     handler.send_message(message, chat_id)
@@ -104,18 +106,21 @@ def main():
     db.setup()
     last_update_id = None
     while True:
+        LOGGER.info("Getting updates")
         updates = handler.get_updates(last_update_id)
         if not updates:
-            logging.info("no updates found")
-        else:
+            LOGGER.info("No updates found")
+        elif updates != []:
             if len(updates["result"]) > 0:
                 last_update_id = handler.get_last_update_id(updates) + 1
-                logging.debug(last_update_id)
+                LOGGER.debug(last_update_id)
                 if handler.id_check(updates):
                     text, chat_id = handler.get_text_and_chat(updates)
                     name = handler.get_name(updates)
-                    logging.debug("Message: {} From: {}".format(text, chat_id))
+                    LOGGER.debug("Message: {} From: {}".format(text, chat_id))
                     text_handler(text, chat_id)
+        else:
+            LOGGER.error("Updates error, update was{}".format(updates))
 
 
 if __name__ == '__main__':
