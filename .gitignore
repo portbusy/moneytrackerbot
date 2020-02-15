@@ -1,3 +1,8 @@
 token.txt
 *.sqlite
 master.txt
+valid_users.txt
+
+.idea
+__pycache__
+.gitignore
