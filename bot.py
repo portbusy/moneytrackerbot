@@ -111,6 +111,8 @@ def text_handler(text, chat_id):
         handler.add_user(user=user)
         message="User "+user+" added successfully!"
         users_dbs_handler()
+    else:
+        message = "Sorry, I cannot process your message :( plese use /start to get started"
     handler.send_message(message, chat_id)
 
 
