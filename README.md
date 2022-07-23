@@ -1,6 +1,7 @@
 # Description
 
-This is the first version of my telegram bot which allows a simple expenses tracker.
+This is the first version of my telegram bot which allows a simple expenses tracker. It is based on 
+[this library](https://github.com/eternnoir/pyTelegramBotAPI) 
 
 The bot can now take income and outcome and display the current month resume; here is a list of commands:
 
