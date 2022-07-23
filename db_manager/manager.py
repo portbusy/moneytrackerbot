@@ -1,7 +1,8 @@
 import sqlite3
+import typing
 
 
-class DBHelper:
+class DatabaseManager:
     def __init__(self, dbname="expenses.sqlite"):
         self.dbname = dbname
         self.conn = sqlite3.connect(dbname)
@@ -37,9 +38,9 @@ class DBHelper:
         self.conn.execute(stmt, args)
         self.conn.commit()
 
-    def get_income(self, month):
+    def get_income(self, month) -> typing.List:
         cur = self.conn.cursor()
-        stmt = "SELECT * FROM income WHERE strftime('%m', date) = '" +month+ "'"
+        stmt = "SELECT * FROM income WHERE strftime('%m', date) = '" + month + "'"
         cur.execute(stmt)
         rows = cur.fetchall()
         return rows
@@ -53,7 +54,7 @@ class DBHelper:
 
     def get_outcome(self, month):
         cur = self.conn.cursor()
-        stmt = "SELECT * FROM outcome WHERE strftime('%m', date) = '"+month+"'"
+        stmt = "SELECT * FROM outcome WHERE strftime('%m', date) = '" + month + "'"
         cur.execute(stmt)
         rows = cur.fetchall()
         return rows
@@ -64,4 +65,3 @@ class DBHelper:
         cur.execute(stmt)
         total = cur.fetchone()
         return total[0]
-

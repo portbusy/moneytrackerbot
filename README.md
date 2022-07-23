@@ -1,7 +1,9 @@
 # Description
+
 This is the first version of my telegram bot which allows a simple expenses tracker.
 
 The bot can now take income and outcome and display the current month resume; here is a list of commands:
+
 * `/listoutcome` print the list of current month outcome
 * `/listincome` print the list of current month income
 * `/delete +/-<income/outcome amount> <comment>` delete the specified entry
@@ -10,8 +12,9 @@ The bot can now take income and outcome and display the current month resume; he
 * `/outcome <outcome amount> <comment>` add to the outcome table the amount and the comment associated
 
 ## Installation
-* First create the `master.txt`  and `token.txt` files, filled respectively with your master chat id 
-    and telegram bot token
+
+* First create the `master.txt`  and `token.txt` files, filled respectively with your master chat id
+  and telegram bot token
 * `Install docker`
 * Go into the clone folder and run `docker build moneytrakerBot/`
 * Copy the container id

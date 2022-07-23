@@ -1,0 +1,25 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  simple:
+    format: "%(levelname) -10s %(asctime)s %(name) -30s %(funcName) -20s %(lineno) -5d: %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    stream: ext://sys.stdout
+
+loggers:
+  __main__:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  telegram:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  db_manager:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
