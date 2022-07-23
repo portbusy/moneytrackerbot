@@ -1,5 +1,5 @@
 requests==2.22.0
-urllib3==1.24.2
+urllib3==1.26.5
 pyTelegramBotAPI
 telebot~=0.0.4
 PyYAML~=6.0
