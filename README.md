@@ -16,9 +16,14 @@ The bot can now take income and outcome and display the current month resume; he
 
 ## Installation
 
-* First create the `master.txt`  and `token.txt` files, filled respectively with your master chat id
-  and telegram bot token
+### Docker run method
 * `Install docker`
-* Go into the clone folder and run `docker build moneytrakerBot/`
+* Create the `token.txt` file, filled with the telegram bot token
+* Go into the clone folder and run `docker build moneytrackerBot/`
 * Copy the container id
 * Run `docker run <container id>`
+
+### Docker compose method
+* `Install docker`
+* Create the `token.txt` file, filled with the telegram bot token
+* Run `docker-compose up -d`
