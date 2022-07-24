@@ -5,12 +5,14 @@ This is the first version of my telegram bot which allows a simple expenses trac
 
 The bot can now take income and outcome and display the current month resume; here is a list of commands:
 
-* `/listoutcome` print the list of current month outcome
-* `/listincome` print the list of current month income
+* `/listoutcome <month>`[^1] print the list of the chosen month outcome, if blank the current month is used
+* `/listincome <month>`[^1] print the list of the chosen month income, if blank the current month is used
 * `/delete +/-<income/outcome amount> <comment>` delete the specified entry
-* `/balance` print total income, total outcome and the difference between those 2 (aka balance)
+* `/balance <month>`[^1] print total income, total outcome and the difference between those 2 (aka balance)
 * `/income <income amount> <comment>` add to the income table the amount and the comment associated
 * `/outcome <outcome amount> <comment>` add to the outcome table the amount and the comment associated
+
+[^1]: Month can be written according to the following example: 'Jul', 'July', '07' or '7'
 
 ## Installation
 
