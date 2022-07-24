@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  moneytrackerbot:
+    build: .
+      container_name: moneytrackerbot
+      networks:
+        telegram_bot:
+
+
+networks:
+  telegram_bot:
