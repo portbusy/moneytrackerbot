@@ -1,5 +1,6 @@
 import logging
 import sys
+import typing
 from datetime import datetime
 
 from telebot import TeleBot
@@ -46,6 +47,23 @@ class MoneyTrackerBot:
         row = f"{row}".replace("(", "").replace(")", "").replace("'", "")
         return f"{row}\n"
 
+    @staticmethod
+    def extract_month_from_message(message_text: str) -> str:
+        """
+        Extract the month from the message, if no month is found return current month
+        :param message_text:
+        :return:
+        """
+        current_month_notations = (datetime.now().strftime('%b'), datetime.now().strftime('%B'),
+                                   datetime.now().strftime('%m'), datetime.now().strftime('%-m'))
+        selected_month: typing.Union[str, int] = message_text.split(' ')[1]
+        try:
+            selected_month = int(selected_month)
+        except ValueError:
+            selected_month = selected_month.capitalize()
+
+        return selected_month if selected_month in current_month_notations else datetime.now().strftime("%m")
+
     @_bot.message_handler(commands=['start', 'help'])
     def welcome_message(self, message: Message):
         """Handles 'start' and 'help' commands"""
@@ -68,15 +86,14 @@ class MoneyTrackerBot:
     @_bot.message_handler(commands=['listincome'])
     def list_income(self, message: Message):
         """List all the income for the current month"""
-        # TODO: add a method to list the income for a specific month
-        current_month = datetime.now().strftime("%m")
-        rows = self._db.get_income(current_month)
+        selected_month = self.extract_month_from_message(message.text)
+        rows = self._db.get_income(selected_month)
         LOGGER.debug(f'Fetched entries: {rows}')
         if rows:
             income_list: str = ""
             for row in rows:
                 income_list += self.format_expense_row(row)
-            month_total_income = self._db.get_total_income(current_month)
+            month_total_income = self._db.get_total_income(selected_month)
             LOGGER.debug(f'Month total: {month_total_income}, formatted income list: {income_list}')
             self._bot.reply_to(message, f'{self._replies.list_income}\n\n{income_list}\n\n'
                                         f'Total income: {month_total_income} €')
@@ -86,15 +103,14 @@ class MoneyTrackerBot:
     @_bot.message_handler(commands=['listoutcome'])
     def list_outcome(self, message: Message):
         """List all the outcome for the current month"""
-        # TODO: add a method to list the outcome for a specific month
-        current_month = datetime.now().strftime("%m")
-        rows = self._db.get_outcome(current_month)
+        selected_month = self.extract_month_from_message(message.text)
+        rows = self._db.get_outcome(selected_month)
         LOGGER.debug(f'Fetched entries: {rows}')
         if rows:
             outcome_list: str = ""
             for row in rows:
                 outcome_list += self.format_expense_row(row)
-            month_total_outcome = self._db.get_total_outcome(current_month)
+            month_total_outcome = self._db.get_total_outcome(selected_month)
             LOGGER.debug(f'Month total: {month_total_outcome}, formatted income list: {outcome_list}')
             self._bot.reply_to(message, f'{self._replies.list_income}\n\n{outcome_list}\n\n'
                                         f'Total income: {month_total_outcome} €')
@@ -103,9 +119,9 @@ class MoneyTrackerBot:
 
     @_bot.message_handler(commands=['balance'])
     def balance(self, message: Message):
-        current_month = datetime.now().strftime("%m")
-        month_total_outcome = self._db.get_total_outcome(current_month)
-        month_total_income = self._db.get_total_income(current_month)
+        selected_month = self.extract_month_from_message(message.text)
+        month_total_outcome = self._db.get_total_outcome(selected_month)
+        month_total_income = self._db.get_total_income(selected_month)
         if month_total_income is None:
             month_total_income = 0.0
         elif month_total_outcome is None:
